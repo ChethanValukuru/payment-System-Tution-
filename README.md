@@ -77,3 +77,5 @@ static QR strips the attribution that would make any of those work. See
 - `report-spec.md` — what the monthly report computes and how.
 - `reminders-spec.md` — how reminders work; the message; the future API option.
 - `decisions.md` — key design decisions, what was rejected, and when to revisit.
+- `apps-script/` — the implementation: the one Apps Script that builds the Sheet
+  and runs the monthly email. See `apps-script/README.md` to install it.
