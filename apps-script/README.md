@@ -50,21 +50,44 @@ all ruled out by `../decisions.md` (D2, D6, D7) and are deliberately absent.
 - **Preview the monthly email** any time: run `sendTestReportEmail`.
 - **Change the report month**: type a different `YYYY-MM` in `Report!B1`.
 
-## Two things to eyeball on the first run
+## Verify it works (sample data — 30 seconds)
 
-I built this against the spec but could not execute Apps Script from where it was
-written, so after your first `setup()` confirm these two — they use the trickier
-Sheets features and are where a fix, if any, would land:
+The code parses cleanly but was never run against a live Sheet during the build.
+`SampleData.gs` closes that gap: it loads a small dataset that exercises every
+rule in the spec, so you can confirm the whole report at a glance.
 
-- The **unpaid list** in `Report` shows one row per parent, and the **"Send
-  reminder"** cell is a live clickable `wa.me` link (it's a `FILTER` over a
-  `HYPERLINK` column).
-- **Sibling grouping**: a parent with two unpaid kids appears once, with both
-  names and the combined amount in the message (a `TEXTJOIN` over the sibling
-  group).
+1. After `setup()`, run **`loadSampleData`** (function dropdown → Run).
+2. Open the `Report` tab (its month is the **current** month).
+3. Check it against this table. If every number matches, the system works.
 
-If either misbehaves, it's isolated to the `Calc` tab columns `P`–`T` and the
-`Report` unpaid-list formula — tell me what you see and I'll adjust.
+**Expected report — for the current month, with sample data:**
+
+| Field | Expected value |
+|---|---|
+| Count paid (full) | **2** (Aarav, Aanya) |
+| Count expected | **6** (Ishaan joins next month and Riya has left, so both are excluded) |
+| Total collected | **₹10,000** |
+| Cash total | **₹4,500** |
+| UPI total | **₹5,500** |
+| Per class — Class 8 | expected 1, paid 1, collected ₹3,500 |
+| Per class — Class 6 | expected 2, paid 0, collected ₹4,500 |
+| Unpaid list | **2 rows**: one grouped reminder to Ravi (Diya + Kabir, **owes ₹6,500**, clickable link); Vihaan (**owes ₹3,000**, **no link** — no number on file) |
+| Partial payments | **Diya** (₹1,000 of ₹3,000) |
+| Overpaid / check | **Advait** (₹3,500 received on a ₹3,000 fee) |
+
+The two things most worth confirming, because they use the trickiest Sheets
+features and are where a fix would land:
+
+- The **"Send reminder"** cell in the unpaid list is a live, clickable `wa.me`
+  link (a `FILTER` over a `HYPERLINK` column).
+- **Sibling grouping**: Ravi appears **once** with both kids and the combined
+  ₹6,500 (a `TEXTJOIN` over the sibling group).
+
+If either misbehaves it's isolated to `Calc` columns `P`–`T` and the Report
+unpaid-list formula — tell me what you see and I'll adjust.
+
+4. When you're satisfied, run **`clearSampleData`** and start adding real
+   students. (It preserves the `DisplayLabel` formula; it only clears data.)
 
 ## Re-running setup()
 
